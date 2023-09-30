@@ -11,6 +11,8 @@ const PORT = 3001;
 app.use(express.json());
 app.use(express.static('public'));
 
+
+//get routes section
 //get route for HTML
 app.get('/notes', (req, res) =>{
     res.sendFile(path.join(__dirname, '/public/notes.html'))
@@ -21,6 +23,21 @@ app.get('/assets/js/index.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'public assets/js/index.js'));
 });
 
+//get route for api
+app.get('/api/notes', (req, res) => {
+    fs.readFile(path.join(__dirname, 'db/db.json'), 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to retreive notes' });
+      }
+      //parse json and output
+      const savedNotes = JSON.parse(data);
+      res.json(savedNotes);
+    });
+  });
+
+
+//CRUD section
 //api post
 app.post('/api/notes', (req, res) => {
     fs.readFile(path.join(__dirname, 'db/db.json'), 'utf8', (err, data) => {
@@ -49,11 +66,11 @@ app.post('/api/notes', (req, res) => {
             console.error(err);
             return res.status(500).json({ error: 'Failed to save note' });
           }
-  
           res.json(newNote);
         });
     });
 });
+
 //listen for incoming connections
 app.listen(PORT, () =>
     console.log(`App listening at http://localhost:${PORT} 🚀`)
