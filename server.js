@@ -26,47 +26,75 @@ app.get('/assets/js/index.js', (req, res) => {
 //get route for api
 app.get('/api/notes', (req, res) => {
     fs.readFile(path.join(__dirname, 'db/db.json'), 'utf8', (err, data) => {
-      if (err) {
+    if (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to retreive notes' });
-      }
+    }
       //parse json and output
-      const savedNotes = JSON.parse(data);
-      res.json(savedNotes);
+    const savedNotes = JSON.parse(data);
+    res.json(savedNotes);
     });
-  });
+});
 
 
 //CRUD section
-//api post
+//api post to add new notes
 app.post('/api/notes', (req, res) => {
     fs.readFile(path.join(__dirname, 'db/db.json'), 'utf8', (err, data) => {
-      if (err) {
+    if (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to save note' });
-      }
+    }
     //data parse and add to newNote to add to json
-      const noteFile = JSON.parse(data);
-      const newNoteId = Date.now().toString();
-      const newNote = {
+    const noteFile = JSON.parse(data);
+    const newNoteId = Date.now().toString();
+    const newNote = {
         id: newNoteId,
         title: req.body.title,
         text: req.body.text,
-      };
-      //push newNote
-      noteFile.push(newNote);
+    };
+    //push newNote
+    noteFile.push(newNote);
 
       //write new note to file
-      fs.writeFile(
+    fs.writeFile(
         path.join(__dirname, 'db/db.json'),
         JSON.stringify(noteFile),
         'utf8',
         (err) => {
-          if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to save note' });
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to save note' });
           }
           res.json(newNote);
+        });
+    });
+});
+
+//api delete 
+app.delete('/api/notes/:id', (req, res) => {
+    fs.readFile(path.join(__dirname, 'db/db.json'), 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed deleting note' });
+      }
+        //parse note json file
+        const noteFile = JSON.parse(data);
+        //const for filtering by ID
+        const noteId = req.params.id;
+        //filter note json by noteID
+        const filteredNotes = noteFile.filter((note) => note.id !== noteId);
+  
+        fs.writeFile(
+            path.join(__dirname, 'db/db.json'),
+            JSON.stringify(filteredNotes),
+            'utf8',
+            (err) => {
+                if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to delete note' });
+          }
+          res.json({ message: 'Note deleted' });
         });
     });
 });
