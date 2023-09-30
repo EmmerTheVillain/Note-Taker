@@ -13,7 +13,7 @@ app.use(express.static('public'));
 
 //get route for HTML
 app.get('/notes', (req, res) =>{
-    res.sendFile(path.join(__dirname, '/notes.html'))
+    res.sendFile(path.join(__dirname, '/public/notes.html'))
 });
 
 //get route for JS
@@ -38,6 +38,20 @@ app.post('/api/notes', (req, res) => {
       };
       //push newNote
       noteFile.push(newNote);
+
+      //write new note to file
+      fs.writeFile(
+        path.join(__dirname, 'db/db.json'),
+        JSON.stringify(noteFile),
+        'utf8',
+        (err) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to save note' });
+          }
+  
+          res.json(newNote);
+        });
     });
 });
 //listen for incoming connections
