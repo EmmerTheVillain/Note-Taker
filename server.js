@@ -21,6 +21,25 @@ app.get('/assets/js/index.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'public assets/js/index.js'));
 });
 
+//api post
+app.post('/api/notes', (req, res) => {
+    fs.readFile(path.join(__dirname, 'db/db.json'), 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to save note' });
+      }
+    //data parse and add to newNote to add to json
+      const noteFile = JSON.parse(data);
+      const newNoteId = Date.now().toString();
+      const newNote = {
+        id: newNoteId,
+        title: req.body.title,
+        text: req.body.text,
+      };
+      //push newNote
+      noteFile.push(newNote);
+    });
+});
 //listen for incoming connections
 app.listen(PORT, () =>
     console.log(`App listening at http://localhost:${PORT} 🚀`)
