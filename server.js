@@ -1,13 +1,15 @@
 //dependencies
 const express = require('express');
 const path = require('path');
-const uuid = require('./helpers/uuid');
 const fs = require('fs');
 
 // start express instance
 const app = express();
 // set port to 3001
 const PORT = 3001;
+
+app.use(express.json());
+app.use(express.static('public'));
 
 //get route for HTML
 app.get('/notes', (req, res) =>{
